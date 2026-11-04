@@ -1,0 +1,145 @@
+VALID_CONDITIONS = ("good", "damage", "under repair")
+artifacts = []
+next_id = 1
+
+
+def get_condition():
+    """Request a valid artifact condition."""
+    while True:
+        condition = input("Condition (good, damage, under repair): ").strip().lower()
+        if condition in VALID_CONDITIONS:
+            return condition
+        print("Invalid condition. Please try again.")
+
+
+def find_by_id(artifact_id):
+    """Return an artifact matching the ID, or None."""
+    for artifact in artifacts:
+        if artifact["id"] == artifact_id:
+            return artifact
+    return None
+
+
+def get_id():
+    """Request a numeric artifact ID."""
+    try:
+        return int(input("Enter artifact ID: "))
+    except ValueError:
+        print("ID must be a number.")
+        return None
+
+
+def display_artifacts(records):
+    """Display artifact details."""
+    if not records:
+        print("No artifacts found.")
+        return
+
+    for artifact in records:
+        print(
+            f"ID: {artifact['id']} | Name: {artifact['name']} | "
+            f"Category: {artifact['category']} | "
+            f"Location: {artifact['location']} | "
+            f"Condition: {artifact['condition']}"
+        )
+
+
+def add_artifact():
+    global next_id
+
+    name = input("Artifact name: ").strip()
+    category = input("Category: ").strip()
+    location = input("Location: ").strip()
+
+    if not name or not category or not location:
+        print("Name, category and location cannot be empty.")
+        return
+
+    artifact = {
+        "id": next_id,
+        "name": name,
+        "category": category,
+        "location": location,
+        "condition": get_condition(),
+    }
+    artifacts.append(artifact)
+    next_id += 1
+    print("Artifact added.")
+
+
+def update_condition():
+    display_artifacts(artifacts)
+    if not artifacts:
+        return
+
+    artifact_id = get_id()
+    if artifact_id is None:
+        return
+
+    artifact = find_by_id(artifact_id)
+    if artifact is None:
+        print("Artifact not found.")
+    else:
+        artifact["condition"] = get_condition()
+        print("Condition updated.")
+
+
+def search_artifacts():
+    name = input("Enter artifact name: ").strip().lower()
+    if not name:
+        print("Search name cannot be empty.")
+        return
+
+    matches = [artifact for artifact in artifacts
+               if name in artifact["name"].lower()]
+    display_artifacts(matches)
+
+
+def delete_artifact():
+    display_artifacts(artifacts)
+    if not artifacts:
+        return
+
+    artifact_id = get_id()
+    if artifact_id is None:
+        return
+
+    artifact = find_by_id(artifact_id)
+    if artifact is None:
+        print("Artifact not found.")
+    else:
+        artifacts.remove(artifact)
+        print("Artifact deleted.")
+
+
+def main():
+    while True:
+        print("\n--- Artifact Management System ---")
+        print("1. Add an artifact")
+        print("2. Update an artifact's condition")
+        print("3. View all artifacts")
+        print("4. Search for an artifact by name")
+        print("5. Delete an artifact")
+        print("6. Exit")
+
+        choice = input("Enter your choice (1-6): ").strip()
+
+        if choice == "1":
+            add_artifact()
+        elif choice == "2":
+            update_condition()
+        elif choice == "3":
+            display_artifacts(artifacts)
+        elif choice == "4":
+            search_artifacts()
+        elif choice == "5":
+            delete_artifact()
+        elif choice == "6":
+            print("Goodbye.")
+            break
+        else:
+            print("Please choose a number from 1 to 6.")
+
+
+if __name__ == "__main__":
+    main()
